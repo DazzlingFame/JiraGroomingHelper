@@ -1,21 +1,6 @@
-import JiraApi from "jira-client";
-import { IncomingWebhook } from "@slack/webhook";
-import { CREDENTIALS, SLACK_HOOK_URL } from "./../credentials.js";
-import {
-  getTasksInStudyQuery,
-  getTasksToEstimateQuery,
-  getTasksToStudyQuery,
-} from "./queries.js";
-
-const webhook = new IncomingWebhook(SLACK_HOOK_URL);
-
-let jira = new JiraApi({
-  ...CREDENTIALS,
-  protocol: "https",
-  host: "profiru.atlassian.net",
-  apiVersion: "2",
-  strictSSL: true,
-});
+import { CREDENTIALS } from "./../credentials.js";
+import SlackService from "./SlackService.js";
+import JiraService from "./JiraService.js";
 
 const RESPONSIBLE_MAP = {
   Web: ["<@kolesnikovvv>", "<@slipenchukdv>"],
@@ -31,13 +16,7 @@ function get_random(list) {
 }
 
 const notifyAboutStudy = async (localMode = false) => {
-  const sprints = (await jira.getAllSprints(40)).values;
-  const next_sprint = sprints.find(
-    (sprint) => sprint.state === "future" && !sprint.completeDate
-  );
-
-  const tasks = await jira.searchJira(getTasksInStudyQuery(next_sprint.name));
-
+  const tasks = await JiraService.getTasksInStudy();
   const messages = tasks.issues.map((task) => {
     const assignee = task.fields.assignee.emailAddress
       ? task.fields.assignee.emailAddress.split("@")[0]
@@ -50,19 +29,12 @@ const notifyAboutStudy = async (localMode = false) => {
     messages.join("\n");
   console.log(message);
   if (!localMode) {
-    await webhook.send({
-      text: message,
-    });
+    await SlackService.sendSlackMessage(message);
   }
 };
 
 const notifyAboutNotStudy = async (localMode = false) => {
-  const sprints = (await jira.getAllSprints(40)).values;
-  const next_sprint = sprints.find(
-    (sprint) => sprint.state === "future" && !sprint.completeDate
-  );
-  const tasks = await jira.searchJira(getTasksToStudyQuery(next_sprint.name));
-
+  const tasks = await JiraService.getTasksToStudy();
   const messages = tasks.issues.map((task) => {
     const main_component = task.fields.components[0]
       ? task.fields.components[0].name
@@ -75,24 +47,16 @@ const notifyAboutNotStudy = async (localMode = false) => {
   });
 
   const message =
-    `\n\n*Нужно взять на проработку для сл. спринта (${next_sprint.name})*\n` +
+    `\n\n*Нужно взять на проработку для следующего спринта*\n` +
     messages.join("\n");
   console.log(message);
   if (!localMode) {
-    await webhook.send({
-      text: message,
-    });
+    await SlackService.sendSlackMessage(message);
   }
 };
 
 const notifyAboutGrooming = async (localMode = false) => {
-  const sprints = (await jira.getAllSprints(40)).values;
-  const next_sprint = sprints.find(
-    (sprint) => sprint.state === "future" && !sprint.completeDate
-  );
-  const tasks = await jira.searchJira(
-    getTasksToEstimateQuery(next_sprint.name)
-  );
+  const tasks = await JiraService.getTasksToEstimate();
   const messages = tasks.issues.map((task) => {
     return `https://profiru.atlassian.net/browse/${task.key} - ${task.fields.summary}`;
   });
@@ -103,9 +67,7 @@ const notifyAboutGrooming = async (localMode = false) => {
     : "\n\n*Нет проработанных задач для оценки*";
   console.log(message);
   if (!localMode) {
-    await webhook.send({
-      text: message,
-    });
+    await SlackService.sendSlackMessage(message);
   }
 };
 
@@ -115,7 +77,7 @@ const notifyAboutTasks = async (localMode = false) => {
   await notifyAboutGrooming(localMode);
 };
 
-if (!CREDENTIALS || !SLACK_HOOK_URL) {
+if (!CREDENTIALS) {
   console.error("PROVIDE CREDENTIALS TO START");
 } else {
   notifyAboutTasks();
