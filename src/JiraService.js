@@ -18,36 +18,32 @@ export const getTasksToStudyQuery = (nextSprintName) =>
 export const getTasksToEstimateQuery = (nextSprintName) =>
   `Sprint = "${nextSprintName}" and "Story Points[Number]" is EMPTY and status = "Awaiting estimate"`;
 
-const getSprints = async () => (await jira.getAllSprints(40)).values;
+const getNextSprint = async () => {
+  const sprints = (await jira.getAllSprints(40)).values;
+  return sprints.find(
+    (sprint) => sprint.state === "future" && !sprint.completeDate
+  );
+};
+
 const searchTickets = async (query) => await jira.searchJira(query);
 
 const getTasksInStudy = async () => {
-  const sprints = await getSprints();
-  const next_sprint = sprints.find(
-    (sprint) => sprint.state === "future" && !sprint.completeDate
-  );
-
-  return await searchTickets(getTasksInStudyQuery(next_sprint.name));
+  const nextSprint = await getNextSprint();
+  return await searchTickets(getTasksInStudyQuery(nextSprint.name));
 };
 
 const getTasksToStudy = async () => {
-  const sprints = await getSprints();
-  const next_sprint = sprints.find(
-    (sprint) => sprint.state === "future" && !sprint.completeDate
-  );
-
+  const next_sprint = await getNextSprint();
   return await searchTickets(getTasksToStudyQuery(next_sprint.name));
 };
 
 const getTasksToEstimate = async () => {
-  const sprints = await getSprints();
-  const next_sprint = sprints.find(
-    (sprint) => sprint.state === "future" && !sprint.completeDate
-  );
-  return  await searchTickets(getTasksToEstimateQuery(next_sprint.name));
+  const next_sprint = await getNextSprint();
+  return await searchTickets(getTasksToEstimateQuery(next_sprint.name));
 };
 
 export default {
+  getNextSprint,
   getTasksInStudy,
   getTasksToStudy,
   getTasksToEstimate,

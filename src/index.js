@@ -1,6 +1,7 @@
 import { CREDENTIALS } from "./../credentials.js";
 import SlackService from "./SlackService.js";
 import JiraService from "./JiraService.js";
+import { getRandomResponsibleForTask } from "./randomUtils.js";
 
 const RESPONSIBLE_MAP = {
   Web: ["<@kolesnikovvv>", "<@slipenchukdv>"],
@@ -10,10 +11,6 @@ const RESPONSIBLE_MAP = {
   Analytics: ["<@proalex>"],
   Product: ["<@karepovals>"],
 };
-
-function get_random(list) {
-  return list[Math.floor(Math.random() * list.length)];
-}
 
 const notifyAboutStudy = async (localMode = false) => {
   const tasks = await JiraService.getTasksInStudy();
@@ -36,12 +33,15 @@ const notifyAboutStudy = async (localMode = false) => {
 const notifyAboutNotStudy = async (localMode = false) => {
   const tasks = await JiraService.getTasksToStudy();
   const messages = tasks.issues.map((task) => {
-    const main_component = task.fields.components[0]
+    const mainTaskComponent = task.fields.components[0]
       ? task.fields.components[0].name
       : "Product";
 
-    const responsibles = RESPONSIBLE_MAP[main_component]
-      ? get_random(RESPONSIBLE_MAP[main_component])
+    const responsibles = RESPONSIBLE_MAP[mainTaskComponent]
+      ? getRandomResponsibleForTask(
+          task.fields.summary,
+          RESPONSIBLE_MAP[mainTaskComponent]
+        )
       : "- нет компонентов - <@karepovals>";
     return `<https://profiru.atlassian.net/browse/${task.key}|${task.fields.summary}> - ${responsibles}`;
   });
