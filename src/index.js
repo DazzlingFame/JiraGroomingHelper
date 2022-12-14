@@ -62,7 +62,7 @@ const notifyAboutGrooming = async (localMode = false) => {
   });
 
   const message = messages.length
-    ? "\n\n*У нас проработаны следующие задачи для оценки сегодня:*\n " +
+    ? "\n\n*У нас проработаны следующие задачи для оценки:*\n " +
       messages.join("\n")
     : "\n\n*Нет проработанных задач для оценки*";
   console.log(message);
