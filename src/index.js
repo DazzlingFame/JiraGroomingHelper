@@ -58,7 +58,7 @@ const notifyAboutNotStudy = async (localMode = false) => {
 const notifyAboutGrooming = async (localMode = false) => {
   const tasks = await JiraService.getTasksToEstimate();
   const messages = tasks.issues.map((task) => {
-    return `https://profiru.atlassian.net/browse/${task.key} - ${task.fields.summary}`;
+    return `<https://profiru.atlassian.net/browse/${task.key}|${task.fields.summary}>`;
   });
 
   const message = messages.length
