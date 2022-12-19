@@ -7,7 +7,7 @@ const RESPONSIBLE_MAP = {
   Web: ["<@kolesnikovvv>", "<@slipenchukdv>"],
   RBO: ["<@kolesnikovvv>", "<@slipenchukdv>"],
   Front: ["<@kolesnikovvv>", "<@slipenchukdv>"],
-  Back: ["<@pankratevks>", "<@osipovao>"],
+  Back: ["<@pankratevks>"],
   Analytics: ["<@proalex>"],
   Product: ["<@karepovals>"],
 };
