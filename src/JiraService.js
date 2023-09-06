@@ -19,10 +19,9 @@ export const getTasksToEstimateQuery = (nextSprintName) =>
   `Sprint = "${nextSprintName}" and "Story Points[Number]" is EMPTY and status = "Awaiting estimate"`;
 
 const getNextSprint = async () => {
-  const sprints = (await jira.getAllSprints(40)).values;
-  return sprints.find(
-    (sprint) => sprint.state === "future" && !sprint.completeDate
-  );
+  // get 1 task with status 'future' from 0 index of board 40
+  const sprints = (await jira.getAllSprints(40, 0, 1, "future")).values;
+  return sprints[0];
 };
 
 const searchTickets = async (query) => await jira.searchJira(query);
