@@ -1,4 +1,4 @@
-import { CREDENTIALS } from "./../credentials.js";
+import { CREDENTIALS } from "../credentials.js";
 import SlackService from "./SlackService.js";
 import JiraService from "./JiraService.js";
 import { getRandomResponsibleForTask } from "./randomUtils.js";
