@@ -3,4 +3,4 @@ export const CREDENTIALS = {
     password: "jira_token",
   };
   
-  export const SLACK_HOOK_URL = "slack_hook_url";
+  export const HOOK_URL = "mm_hook_url";

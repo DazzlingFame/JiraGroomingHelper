@@ -1,5 +1,5 @@
 import { CREDENTIALS } from "../credentials.js";
-import SlackService from "./SlackService.js";
+import SenderService from "./SenderService.js";
 import JiraService from "./JiraService.js";
 import { getRandomResponsibleForTask } from "./randomUtils.js";
 
@@ -26,7 +26,7 @@ const notifyAboutStudy = async (localMode = false) => {
     messages.join("\n");
   console.log(message);
   if (!localMode) {
-    await SlackService.sendSlackMessage(message);
+    await SenderService.sendMessage(message);
   }
 };
 
@@ -51,7 +51,7 @@ const notifyAboutNotStudy = async (localMode = false) => {
     messages.join("\n");
   console.log(message);
   if (!localMode) {
-    await SlackService.sendSlackMessage(message);
+    await SenderService.sendMessage(message);
   }
 };
 
@@ -67,7 +67,7 @@ const notifyAboutGrooming = async (localMode = false) => {
     : "\n\n*Нет проработанных задач для оценки*";
   console.log(message);
   if (!localMode) {
-    await SlackService.sendSlackMessage(message);
+    await SenderService.sendMessage(message);
   }
 };
 
